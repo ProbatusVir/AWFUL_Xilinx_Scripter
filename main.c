@@ -9,6 +9,7 @@
 
 #define CONSOLE_SPEAKER_COLOR	"\33[33m"
 #define USER_SPEAKER_COLOR		"\33[37m"
+#define ERROR_COLOR				"\33[31m"
 
 #define VARIABLE_NAME_PROMPT	CONSOLE_SPEAKER_COLOR "Name of variable %llu: " USER_SPEAKER_COLOR
 #define VARIABLE_COUNT_PROMPT	CONSOLE_SPEAKER_COLOR "Number of variables: " USER_SPEAKER_COLOR
@@ -28,9 +29,8 @@ int main(void)
 
 	//Get a number of variables between 1 and 64
 	const size_t number_of_variables = cget_pos_int(1, MAX_BITS, VARIABLE_COUNT_PROMPT);
-	//const size_t number_of_variables =3;
 	XilVariable* variables = malloc(number_of_variables * sizeof(XilVariable)); //at most this will be 2304 bytes
-
+	size_t total_bits = 0;
 	//Get all the names
 	char name_prompt_buffer[name_prompt_size] = {0};
 	char* name_input_buffer[XIL_VARIABLE_NAME_LENGTH + 1] = {0};
@@ -44,6 +44,14 @@ int main(void)
 			cget_line(name_input_buffer, XIL_VARIABLE_NAME_LENGTH, name_prompt_buffer);
 			variables[variable_index] = MakeVariable(name_input_buffer);
 		}
+		total_bits += variables[variable_index].variable_size;
+	}
+
+	if (total_bits > MAX_BITS)
+	{
+		printf(ERROR_COLOR "ERROR: You have specified too many inputs. Please keep in the range of 1-64.\n" USER_SPEAKER_COLOR);
+		system("PAUSE");
+		return EXIT_FAILURE;
 	}
 
 

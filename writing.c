@@ -70,6 +70,8 @@ void write_script(const XilVariable* variables, const size_t number_of_variables
 		total_bits += variables[i].variable_size;
 	}
 
+	assert(total_bits <= sizeof(size_t) * 8);
+
 	const size_t final_value = power(2, total_bits) - 1;
 	const int final_digits = digits(final_value);
 
@@ -100,11 +102,11 @@ void write_script(const XilVariable* variables, const size_t number_of_variables
 		for(size_t j = 0, bits_expressed = 0; j < number_of_variables; ++j)
 		{
 			//Left to right - convert to bool (get cursor bit, select bit) flip -- if flip = 0
-			const int bit = (!!((1ull << j) & i)) ^ flip;
-			sprintf(buf, ASSIGNMENT, variables[j].variable_name, itoa(bit, num_rep_buf, 2)); //FIXME: This is only good for single bits right now
+			sprintf(buf, ASSIGNMENT, variables[j].variable_name, partial_bit_rep(i, bits_expressed, variables[j].variable_size, flip, num_rep_buf));
 			if (variables[j].variable_size > 1)
 				strreplace(buf, '\'', '"');
 			printf(center_align_in_place(buf, buf_size - 1));
+			bits_expressed += variables[j].variable_size;
 		}
 		if (assert_expression)
 		{
@@ -124,7 +126,7 @@ void write_script(const XilVariable* variables, const size_t number_of_variables
 //
 size_t get_bit_section(const size_t value, const size_t bit_start, const size_t n, const bool flip)
 {
-	assert(n + bit_start != sizeof(size_t) * 8);
+	assert(n + bit_start <= sizeof(size_t) * 8);
 	// Create a block of n 1's, then move them over to the start
 	const size_t flag = (pow(2, n) - 1) * pow(2, bit_start);
 
