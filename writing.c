@@ -41,15 +41,15 @@
  */
 #define tab "    "
 
-void write_script(const XilVariable* variables, const size_t number_of_variables, const int wait_time, const char* assert_expression, const bool flip)
+void xil_WriteScript(const XilVariable* variables, const size_t number_of_variables, const int wait_time, const char* assert_expression, const bool flip)
 {
 	/* TODO: Maybe make the output function optional, between print and write. Will need to learn better C first.
 	 * TODO: Implement the use of the variable struct
 	 */
-	constexpr const char ASSERTION_SCRIPT[]	= "\n" tab "assert %s report \"Error on line %*llu\" severity failure;\n\n";
-	constexpr const char FINAL_ASSERTION[]	= "\n" tab "assert false report \"Simulation Finished\" severity failure;\n";
-	constexpr const char COMMENT[]			= tab "-- Test %*llu --\n";
-	constexpr const char ASSIGNMENT[]		= tab "%s <= '%s';\n";
+	constexpr char ASSERTION_SCRIPT[]	= "\n" tab "assert %s report \"Error on line %*llu\" severity failure;\n\n";
+	constexpr char FINAL_ASSERTION[]	= "\n" tab "assert false report \"Simulation Finished\" severity failure;\n";
+	constexpr char COMMENT[]			= tab "-- Test %*llu --\n";
+	constexpr char ASSIGNMENT[]		= tab "%s <= '%s';\n";
 	const size_t assert_expression_len = (assert_expression ? strlen(assert_expression) : 0);
 	int total_bits = 0;
 	size_t largest_variable_name = 0;
@@ -76,7 +76,7 @@ void write_script(const XilVariable* variables, const size_t number_of_variables
 	const int final_digits = digits(final_value);
 
 	/* This is dumb, but this is calculating the largest string*/
-	size_t sizes[] = {
+	const size_t sizes[] = {
 		 (!assert_expression ? 0 : (sizeof(ASSERTION_SCRIPT) - 1) + assert_expression_len + final_digits - (2 + 5)) // - (%s + %*llu
 		,(sizeof(FINAL_ASSERTION) - 1)
 		,(sizeof(COMMENT) - 1) + final_digits - (5) // - %*llu
@@ -102,7 +102,7 @@ void write_script(const XilVariable* variables, const size_t number_of_variables
 		for(size_t j = 0, bits_expressed = 0; j < number_of_variables; ++j)
 		{
 			//Left to right - convert to bool (get cursor bit, select bit) flip -- if flip = 0
-			sprintf(buf, ASSIGNMENT, variables[j].variable_name, partial_bit_rep(i, bits_expressed, variables[j].variable_size, flip, num_rep_buf));
+			sprintf(buf, ASSIGNMENT, variables[j].variable_name, xil_PartialBitRep(i, bits_expressed, variables[j].variable_size, flip, num_rep_buf));
 			if (variables[j].variable_size > 1)
 				strreplace(buf, '\'', '"');
 			printf(center_align_in_place(buf, buf_size - 1));
@@ -124,7 +124,7 @@ void write_script(const XilVariable* variables, const size_t number_of_variables
 }
 
 //
-size_t get_bit_section(const size_t value, const size_t bit_start, const size_t n, const bool flip)
+size_t xil_GetBitSection(const size_t value, const size_t bit_start, const size_t n, const bool flip)
 {
 	assert(n + bit_start <= sizeof(size_t) * 8);
 	// Create a block of n 1's, then move them over to the start
@@ -134,9 +134,9 @@ size_t get_bit_section(const size_t value, const size_t bit_start, const size_t 
 	return ((value & flag) ^ (flip ? flag : 0 )) / pow(2, bit_start);
 }
 
-char* partial_bit_rep(const size_t value, const size_t bit_start, const size_t n, const bool flip, char* dst)
+char* xil_PartialBitRep(const size_t value, const size_t bit_start, const size_t n, const bool flip, char* dst)
 {
-	const size_t sequence = get_bit_section(value, bit_start, n, flip);
+	const size_t sequence = xil_GetBitSection(value, bit_start, n, flip);
 	for (size_t i = 0; i < n; i++)
 	{
 		const int bit = !!((1ull << i) & sequence);
@@ -146,7 +146,7 @@ char* partial_bit_rep(const size_t value, const size_t bit_start, const size_t n
 	return dst;
 };
 
-XilVariable MakeVariable(const char* declaration)
+XilVariable xil_MakeVariable(const char* declaration)
 {
 	XilVariable var = {
 		.variable_size = -1,

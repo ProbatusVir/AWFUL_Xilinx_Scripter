@@ -52,14 +52,14 @@ int TestMakeVariable()
 		if (!strcmp(test_cases[i], "a4[64]"))
 			printf("");
 
-		const XilVariable var = MakeVariable(test_cases[i]);
+		const XilVariable var = xil_MakeVariable(test_cases[i]);
 		const int local_success = var.variable_size == expt_rslts[i];
 		success = success && local_success;
 
 		if (!local_success)
 		{
 			printf("\tTest %llu -- creating variable from %s failed. -- expected: %d, got: %d\n", i, test_cases[i], expt_rslts[i], var.variable_size);
-			MakeVariable((test_cases[i]));
+			xil_MakeVariable((test_cases[i]));
 		}
 	}
 

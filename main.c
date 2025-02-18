@@ -42,7 +42,7 @@ int main(void)
 		while (variables[variable_index].variable_size < 1 || variables[variable_index].variable_size > MAX_BITS)
 		{
 			cget_line(name_input_buffer, XIL_VARIABLE_NAME_LENGTH, name_prompt_buffer);
-			variables[variable_index] = MakeVariable(name_input_buffer);
+			variables[variable_index] = xil_MakeVariable(name_input_buffer);
 		}
 		total_bits += variables[variable_index].variable_size;
 	}
@@ -66,7 +66,7 @@ int main(void)
 		assertion = nullptr;
 	}
 
-	write_script(variables, number_of_variables, 10, assertion, 0);
+	xil_WriteScript(variables, number_of_variables, 10, assertion, 0);
 	//Cleanup
 	free(variables);
 
