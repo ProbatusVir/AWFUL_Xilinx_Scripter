@@ -11,6 +11,7 @@
 #define USER_SPEAKER_COLOR		"\33[37m"
 #define ERROR_COLOR				"\33[31m"
 
+#define VARIABLE_NAME_TUTORIAL	CONSOLE_SPEAKER_COLOR " * Variable names must start with a letter or underscore and may only contain alphanumeric characters and underscores. \n * You may put a number in brackets like so Xin[4] to specify how large a bus the variable needs, if at all.\n * One may opt not to as well for a single bit variable.\n * TOTAL BITS MAY NOT EXCEED %llu!\n" USER_SPEAKER_COLOR
 #define VARIABLE_NAME_PROMPT	CONSOLE_SPEAKER_COLOR "Name of variable %llu: " USER_SPEAKER_COLOR
 #define VARIABLE_COUNT_PROMPT	CONSOLE_SPEAKER_COLOR "Number of variables: " USER_SPEAKER_COLOR
 #define ASSERTION_PROMPT		CONSOLE_SPEAKER_COLOR "Enter assert expression (eg. O = Xin xor Yin) or press enter.\nExpression: " USER_SPEAKER_COLOR
@@ -32,6 +33,7 @@ int main(void)
 	XilVariable* variables = malloc(number_of_variables * sizeof(XilVariable)); //at most this will be 2304 bytes
 	size_t total_bits = 0;
 	//Get all the names
+	printf(VARIABLE_NAME_TUTORIAL, MAX_BITS);
 	char name_prompt_buffer[name_prompt_size] = {0};
 	char name_input_buffer[XIL_VARIABLE_NAME_LENGTH + 1] = {0};
 	for(size_t variable_index = 0; variable_index < number_of_variables; ++variable_index)
