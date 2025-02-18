@@ -33,7 +33,7 @@ int main(void)
 	size_t total_bits = 0;
 	//Get all the names
 	char name_prompt_buffer[name_prompt_size] = {0};
-	char* name_input_buffer[XIL_VARIABLE_NAME_LENGTH + 1] = {0};
+	char name_input_buffer[XIL_VARIABLE_NAME_LENGTH + 1] = {0};
 	for(size_t variable_index = 0; variable_index < number_of_variables; ++variable_index)
 	{
 		variables[variable_index] = (XilVariable){-1};
@@ -41,7 +41,7 @@ int main(void)
 
 		while (variables[variable_index].variable_size < 1 || variables[variable_index].variable_size > MAX_BITS)
 		{
-			cget_line(name_input_buffer, XIL_VARIABLE_NAME_LENGTH, name_prompt_buffer);
+			cget_line(name_input_buffer, sizeof(name_input_buffer), name_prompt_buffer); //FIXME: ??? Apparently, if too many characters are input, it overflows into the next name. -- this is more of a fix in cget_line
 			variables[variable_index] = xil_MakeVariable(name_input_buffer);
 		}
 		total_bits += variables[variable_index].variable_size;
